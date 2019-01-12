@@ -42,7 +42,7 @@ namespace MouseStreaming
 			//.Subscribe((_)=> Dispatcher.InvokeAsync(()=> DataContext = new {X = "押されてる" }));
 			
 			bool flag = false;
-			keyBoard.Where(arg=> Input.GetKeyDown(Keys.F15))
+			keyBoard.Where(arg=> Input.GetKeyDown(Keys.F13))
 					.Subscribe(arg=>
 					{
 						Input.SendInputKey(Keys.A);
