@@ -6,7 +6,7 @@ using System.Reactive.Linq;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace MouseStreaming
+namespace LinqHotKey
 {
 	static public class Input
 	{
@@ -74,30 +74,13 @@ namespace MouseStreaming
 		[DllImport("user32.dll", EntryPoint = "MapVirtualKeyA")]
 		private extern static int MapVirtualKey(int wCode, int wMapType);
 
-		static bool released =false;
-		static KBDLLHOOKSTRUCT kBDLLHOOKSTRUCT;
-
-		static Input()
-		{
-			//KeyBoardEvent.Start((arg)=>
-			//{
-			//	kBDLLHOOKSTRUCT = arg;
-			//});
-		}
-		
 
 		static public bool GetKeyDown(Keys key)
 		{
-			Console.WriteLine(GetKeyState(key));
 			return GetKeyState(key) < GET_KEY_STATE;
 		}
-		static public bool GetKeyboardDown(Keys key,string log)
-		{
-			var s = GetKeyState(key);
-			Console.WriteLine(s + " " + log);
-			return s < GET_KEY_STATE;
-		}
-		static public bool GetKeyboardDown(params Keys[] keys)
+		
+		static public bool GetKeyDown(params Keys[] keys)
 		{
 			foreach(var key in keys)
 			{
@@ -106,22 +89,8 @@ namespace MouseStreaming
 			}
 			return true;
 		}
-		static int toggle = 0;
-		static public bool GetKeyDownFirst(Keys key)
-		{
-			var currentState = GetAsyncKeyState(key);
-			var currentToggle = currentState & 0x01;
-			if(currentState < GET_KEY_STATE && currentToggle != toggle)
-			{ 
-				toggle = currentToggle;
-				return true;
-			}
-			else
-			{
-				return	false;
-			}
-		}
 
+		
 			
 		static public void SendInputKey(Keys inputKey)
 		{

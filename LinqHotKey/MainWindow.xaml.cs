@@ -11,8 +11,9 @@ using System.Runtime.InteropServices;
 using System.Windows.Threading;
 using System.Windows.Forms;
 using System.Windows.Interop;
+using static System.Windows.Forms.DataFormats;
 
-namespace MouseStreaming
+namespace LinqHotKey
 {
 
 
@@ -42,12 +43,15 @@ namespace MouseStreaming
 			//.Subscribe((_)=> Dispatcher.InvokeAsync(()=> DataContext = new {X = "押されてる" }));
 			
 			bool flag = false;
-			keyBoard.Where(arg=> Input.GetKeyDown(Keys.F13))
+			keyBoard.Where(arg=> arg.EventName == EventMessage.RBUTTON_DOWN )
 					.Subscribe(arg=>
 					{
-						Input.SendInputKey(Keys.A);
+						arg.OutputParamater();
+						Input.SendInputKey(Keys.B);
 					});
 
+			//keyBoard.Where(arg=>arg.EventName == EventMessage.WM_MOUSEWHEEL)
+			//		.Subscribe(arg=>Console.WriteLine("wPalam ={0}",arg.MouseEvent.mouseData));
 
 			//drivedObject.Where(_=>Input.GetKeyDown(Keys.E))
 			//	.Subscribe(_=>Console.WriteLine(String.Format("{0:X8}",Marshal.GetLastWin32Error())));
@@ -106,7 +110,8 @@ namespace MouseStreaming
 	public class DeviceEventArg : EventArgs
 	{
 		public KBDLLHOOKSTRUCT KeyEvent{get; set;} = new KBDLLHOOKSTRUCT();
-		public MouseEventArg MouseEvent{get;private set;} = new MouseEventArg();
+		public MSLLHOOKSTRUCT MouseEvent{get; set;} = new MSLLHOOKSTRUCT();
+		public EventMessage EventName;
 	}
 
 	public class KeyBoardStreamMock : IObservable<DeviceEventArg>

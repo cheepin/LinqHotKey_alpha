@@ -4,7 +4,7 @@ using System.Reactive.Subjects;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace MouseStreaming
+namespace LinqHotKey
 {
 	public class EveryUpdateObservable : IObservable<int>
 	{

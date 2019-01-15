@@ -9,7 +9,7 @@ using System.Runtime.InteropServices;
 using System.Reactive;
 using System.Reactive.Linq;
 
-namespace MouseStreaming
+namespace LinqHotKey
 {
 	/// <summary>
 	///　マウスもしくはキーボードイベントが発生した時にコールバックされるObservableクラス。
@@ -22,6 +22,8 @@ namespace MouseStreaming
 	public class DeviceObservable : IObservable<DeviceEventArg>
 	{
 		private Subject<DeviceEventArg> subject  = new Subject<DeviceEventArg>();
+		private KBDLLHOOKSTRUCT KBStructZero = new KBDLLHOOKSTRUCT();
+		private MSLLHOOKSTRUCT MSStructZero = new MSLLHOOKSTRUCT();
 
 		/// <summary>
 		/// コンストラクター
@@ -36,12 +38,25 @@ namespace MouseStreaming
 			 * キーボードイベントを登録する。
 			 * イベントが起きるたびにStart内のデリゲートがコールバックされ、オブザーバーにDeviceEventArgを配信する。
 			 */
-			KeyBoardEvent.Start((arg) =>
+
+			DeviceEvent.Start((EventMessage eventName,KBDLLHOOKSTRUCT arg) =>
 			{
 				//DeviceEventArgにキーボードイベントを詰め込む
 				deviceEventArg.KeyEvent = arg;
+				deviceEventArg.EventName = eventName;
+				deviceEventArg.MouseEvent = MSStructZero;
 				subject.OnNext(deviceEventArg);
-			});
+			},DeviceName.Keyboard);
+
+			DeviceEvent.Start((EventMessage eventName,MSLLHOOKSTRUCT arg) =>
+			{
+				//DeviceEventArgにマウスイベントを詰め込む
+				
+				deviceEventArg.MouseEvent = arg;
+				deviceEventArg.EventName = eventName;
+				deviceEventArg.KeyEvent = KBStructZero;
+				subject.OnNext(deviceEventArg);
+			},DeviceName.Mouse);
 		}
 
 		/// <summary>
@@ -50,10 +65,11 @@ namespace MouseStreaming
 		/// <param name="predicate"></param>
 		/// <returns></returns>
 		public IObservable<DeviceEventArg> Where(Func<DeviceEventArg, bool> predicate)
-		{ 
+		{
+
 			return this.Where<DeviceEventArg>(predicate)
 				.Where((arg) => arg.KeyEvent.dwExtraInfo.ToInt32() != 128);
-			
+
 		}
 
 		public IDisposable Subscribe(IObserver<DeviceEventArg> observer)
